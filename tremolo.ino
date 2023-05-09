@@ -11,7 +11,7 @@ AudioOutputI2S audioOutput;
 AudioConnection inToTrem(audioInput, 0, tremolo, 0);
 AudioConnection inToMixer(audioInput, 0, mixer, 0);
 AudioConnection tremToMixer(tremolo, 0, mixer, 1);
-AudioConnection mixerToOut(mixer, 0, audioOutput, 1);
+AudioConnection mixerToOut(mixer, 0, audioOutput, 0);
 
 float depth = 0.7;
 int speed = 100;
