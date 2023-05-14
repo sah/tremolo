@@ -14,7 +14,7 @@ AudioConnection tremToMixer(tremolo, 0, mixer, 1);
 AudioConnection mixerToOut(mixer, 0, audioOutput, 0);
 
 float depth = 0.7;
-int speed = 100;
+int speed = 200;
 
 void setup() {
     AudioMemory(8); // Set the buffer size;

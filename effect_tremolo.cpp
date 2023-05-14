@@ -6,7 +6,7 @@ void AudioEffectTremolo::begin(uint32_t milliseconds)
 {
     // These variables are stored on the AudioEffectTremolo object and
     // hold the current state of the effect.
-    samples = milliseconds * 44.1;
+    half_cycle_samples = milliseconds * 44.1 / 2.0;
     position = 0;
     square_state = -1;
     clickless_sq_state = -1;
@@ -25,7 +25,7 @@ void AudioEffectTremolo::update(void)
     if (!block) return;
 
     for (int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-	if (!(position % samples)) {
+	if (!(position % half_cycle_samples)) {
 	    square_state = -square_state;
 	    position = 0;
 	}
@@ -49,7 +49,7 @@ void AudioEffectTremolo::update(void)
 	// but scale them down so that the positive cycle samples sum
 	// to 2, taking our triangle wave from -1 to 1, and subtract 2
 	// during the negative to take us back to -1.
-	triangle_state += square_state / (samples / 2);
+	triangle_state += square_state / (half_cycle_samples / 2);
 	triangle_state = constrain(triangle_state, -1, 1);
 
 	// To get something more like a sine wave, we can add up the
@@ -58,7 +58,7 @@ void AudioEffectTremolo::update(void)
 	// area of a square, so we divide by 2 again). This produces a
 	// parabolic wave, which is close enough to a sine wave for
 	// our purposes.
-	parabolic_state += triangle_state / (samples / (2 * 2));
+	parabolic_state += triangle_state / (half_cycle_samples / (2 * 2));
 	parabolic_state = constrain(parabolic_state, -1, 1);
 
 	// Shift the final wave form into the range from 0 to 1, then
