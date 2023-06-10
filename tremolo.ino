@@ -13,11 +13,8 @@ AudioConnection inToMixer(audioInput, 0, mixer, 0);
 AudioConnection tremToMixer(tremolo, 0, mixer, 1);
 AudioConnection mixerToOut(mixer, 0, audioOutput, 0);
 
-float depth = 0.7;
-int speed = 200;
-
 void setup() {
-    AudioMemory(8); // Set the buffer size;
+    AudioMemory(8); // Set the buffer size
 
     codec.enable();
     codec.inputSelect(AUDIO_INPUT_LINEIN);
@@ -26,12 +23,29 @@ void setup() {
     codec.lineInLevel(5);
     codec.lineOutLevel(20);
 
-    mixer.gain(0, 1 - depth);
-    mixer.gain(1, depth);
-
-    tremolo.begin(speed);
+    // Initial values don't matter much, since the loop will
+    // immediately overwrite them.
+    mixer.gain(0, 0.5);
+    mixer.gain(1, 0.5);
+    tremolo.begin(200);
 }
 
 void loop() {
-    // This is where we would read user interface elements to control the speed and depth.
+    // 10-bit ADCs, max value is 1023.
+    float speed = analogRead(A0) / 1023.0;
+    float vol = analogRead(A1) / 1023.0;
+    float depth = analogRead(A2)  / 1023.0;
+    int shape = analogRead(A3);
+
+    // Convert speed to 85-1000ms:
+    tremolo.setSpeed(85 + (1 - speed) * 915);
+
+    // In the mixer, depth controls balance between the wet and dry
+    // channels, while vol controls the scale of both channels:
+    mixer.gain(0, (1 - depth) * vol);
+    mixer.gain(1, depth * vol);
+
+    // We use waveform 0 (square wave) if shape is less than 512, and
+    // 2 (sine-like parabolic wave) otherwise.
+    tremolo.setWaveform(shape < 512 ? 0 : 2);
 }

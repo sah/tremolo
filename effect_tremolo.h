@@ -11,6 +11,8 @@ public:
         AudioStream(1, inputQueueArray), position(0) {}
     void begin(uint32_t milliseconds);
     virtual void update(void);
+    void setSpeed(uint32_t milliseconds);
+    void setWaveform(int newWaveform);
 private:
     audio_block_t *inputQueueArray[1];
 
@@ -21,6 +23,7 @@ private:
     float clickless_sq_state;
     float triangle_state;
     float parabolic_state;  // pseudo-sine wave
+    int waveform;
 };
 
 #endif

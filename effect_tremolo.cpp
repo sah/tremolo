@@ -8,10 +8,11 @@ void AudioEffectTremolo::begin(uint32_t milliseconds)
     // hold the current state of the effect.
     half_cycle_samples = milliseconds * 44.1 / 2.0;
     position = 0;
-    square_state = -1;
-    clickless_sq_state = -1;
+    square_state = 1;
+    clickless_sq_state = 1;
     triangle_state = -1;
     parabolic_state = 0;
+    waveform = 2;
 }
 
 // This function is called once for every block of AUDIO_BLOCK_SAMPLES
@@ -25,7 +26,7 @@ void AudioEffectTremolo::update(void)
     if (!block) return;
 
     for (int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-	if (!(position % half_cycle_samples)) {
+	if (position > half_cycle_samples) {
 	    square_state = -square_state;
 	    position = 0;
 	}
@@ -63,10 +64,28 @@ void AudioEffectTremolo::update(void)
 
 	// Shift the final wave form into the range from 0 to 1, then
 	// multiply by the audio sample to scale its volume.
-	block->data[i] = block->data[i] * (parabolic_state + 1) / 2;
+	float waveform_state = clickless_sq_state;
+	if (waveform == 1) {
+	    waveform_state = triangle_state;
+	} else if (waveform == 2) {
+	    waveform_state = parabolic_state;
+	}
+	block->data[i] = block->data[i] * (waveform_state + 1) / 2;
 	position++;
     }
 
     transmit(block, 0);
     release(block);
+}
+
+// Update the speed
+void AudioEffectTremolo::setSpeed(uint32_t milliseconds)
+{
+    half_cycle_samples = milliseconds * 44.1 / 2.0;
+}
+
+// Update the waveform
+void AudioEffectTremolo::setWaveform(int newWaveform)
+{
+    waveform = newWaveform;
 }
