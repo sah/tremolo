@@ -14,8 +14,16 @@ AudioConnection tremToMixer(tremolo, 0, mixer, 1);
 AudioConnection mixerToOut(mixer, 0, audioOutput, 0);
 
 void setup() {
-    AudioMemory(8); // Set the buffer size
+    // Set the buffer size:
+    AudioMemory(8);
 
+    // Configure pins we plan to use as inputs:
+    pinMode(A0, INPUT);
+    pinMode(A1, INPUT);
+    pinMode(A2, INPUT);
+    pinMode(A3, INPUT);
+
+    // Enable the SGTL5000 and configure its inputs and outpus:
     codec.enable();
     codec.inputSelect(AUDIO_INPUT_LINEIN);
     codec.muteHeadphone();
