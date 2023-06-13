@@ -3,10 +3,10 @@
 
 AudioControlSGTL5000 codec;
 
+AudioOutputI2S audioOutput;
 AudioInputI2S audioInput;
 AudioEffectTremolo tremolo;
 AudioMixer4 mixer;
-AudioOutputI2S audioOutput;
 
 AudioConnection inToTrem(audioInput, 0, tremolo, 0);
 AudioConnection inToMixer(audioInput, 0, mixer, 0);
